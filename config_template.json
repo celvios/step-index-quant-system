@@ -1,0 +1,10 @@
+{
+  "api_token": "YOUR_DERIV_API_TOKEN_HERE",
+  "app_id": "1089",
+  "is_demo": true,
+  "risk_mode": "moderate",
+  "initial_balance": 10000,
+  "max_daily_trades": 50,
+  "stop_loss_percent": 20,
+  "target_profit_percent": 1000
+}

@@ -1,0 +1,9 @@
+@echo off
+echo Starting Step Index Pro Bot...
+echo.
+echo Installing requirements...
+pip install -r requirements_app.txt
+echo.
+echo Launching application...
+streamlit run app.py --server.port 8501 --server.headless false
+pause

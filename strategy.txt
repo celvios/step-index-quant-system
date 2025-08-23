@@ -1,0 +1,259 @@
+1. Market Structure Logic (HTF: 4H/Daily)
+1.1. Liquidity Sweep Detection
+Valid Sweep = Break of prior structure + immediate rejection
+
+Confirmation Criteria:
+
+Break prior swing point by ≥ 0.3 steps (3 consecutive steps)
+
+Rejection candle closes within 0.1 steps of broken structure
+
+BOS follows within 3 candles
+1.2. Break of Structure (BOS)
+Bullish BOS:
+
+Break above swing high with 3+ consecutive upward steps
+
+Close above broken high
+
+Bearish BOS:
+
+Break below swing low with 3+ consecutive downward steps
+
+Close below broken low
+1.3. Fibonacci POI (Point of Interest)
+Drawing Rules:
+
+Anchor 1: Swing low (wick) for bullish setups
+
+Anchor 2: Swing high (wick) for bearish setups
+
+POI Zone:
+
+Normal volatility: 0.60-0.80 retracement (rounded to nearest 0.1 step)
+
+High volatility (ATR > 2σ): 0.55-0.82
+
+Low volatility (ATR < 0.5σ): 0.65-0.75
+2. Entry Execution (LTF: 30M/1H)
+2.1. Entry Triggers
+
+Entry Type	Price Level	Requirements
+Primary	0.618 Fib	Cluster density >40% at level
+Secondary	0.786 Fib	Step velocity ≥3 in POI
+Reactive	0.50 Fib	Engulfing/pinbar + liquidity sweep
+
+2.2. Step Velocity Confirmation
+Required: 3+ consecutive steps in trade direction
+
+Validation Window: Within 3 candles of entry
+
+Rejection Criteria: <2 steps → cancel trade
+
+2.3. Confluence Scoring
+
+
+Factor	Weight	Validation
+Fib Alignment	40%	Within 0.05 steps
+Cluster Density	30%	>60% at level
+Step Velocity	20%	≥3 consecutive steps
+Psychological Level	10%	Whole/.5/.25 step
+	
+Minimum Score: 75/100 for execution
+
+3.Exit Strategy
+
+Target	      Level	           Position %	          Special Rules
+TP1	              -0.27 Fib 	            100%	                              +0.2 step buffer
+Trailing Stop    Dynamic	            -                 0.1 step trail per new extreme
+
+
+3.2. Trail Logic
+After 0.5% profit → Move SL to breakeven
+
+Each new step extreme → Trail by 0.1 steps
+
+Close if step reversal (2+ opposite steps)
+
+
+3.3. Stop Loss
+Entry Type	SL Placement
+0.618 Fib	0.786 Fib level
+0.786 Fib	0.85 Fib level
+0.50 Fib	               Beyond rejection candle
+
+
+4.Risk Management
+
+4.1. Position Sizing
+
+def calculate_risk(confluence_score):
+    if confluence_score >= 85: return 0.08  # 8%
+    elif confluence_score >= 75: return 0.05 # 5%
+    else: return 0.02  # 2%
+
+4.2. Circuit Breakers
+Daily Drawdown: 8% → Stop trading
+
+Peak-to-Trough: 15% → 24hr cooldown
+
+Volatility Filter: ATR < 0.3σ → No entries
+
+5.Step Index Specialization
+
+5.1. Psychological Levels
+Whole numbers (8500.0)
+
+Half-steps (8525.0)
+
+Quarter-steps (8512.5)
+
+Scanner Priority: Whole > Half > Quarter
+
+5.2. Cluster Density
+
+def cluster_density(price, lookback=5):
+    return sum(1 for i in range(-lookback, lookback+1) 
+           if abs(price - round(price, 1)) < 0.01) / (2*lookback + 1)
+
+
+5.3. Step Acceleration
+
+def step_velocity(prices, threshold=3):
+    count = 0
+    for i in range(1, len(prices)):
+        if abs(prices[i] - prices[i-1]) == 0.1:
+            count += 1
+        else:
+            count = 0
+        if count >= threshold:
+            return True
+return False
+
+6. Trade Management Protocol
+6.1. Entry Validation
+Confirm step velocity within 3 candles
+
+Verify cluster density >40% at POI
+
+Re-score confluence at execution
+
+6.2. Exit Optimization
+Break even after 0.5% profit
+
+Trail using 0.1 step increments
+
+Close at psychological barriers +0.2 step buffer
+
+RR Position Scaling Strategy for Step Index
+
+Core Concept: Volatility-Adaptive Scaling Pyramid
+This strategy increases reward-risk ratio by dynamically scaling position size and profit targets based on real-time market conditions and trade momentum.
+
+Confluence score	Risk	Position Size	TP Multiplier	R:R Target
+90-100	10%	Full	1.0x	1:4
+80-89	7%	70%	1.2x	1:5
+75-79	5%	50%	1.5x	1:6
+def base_position(capital, score):
+    if score >= 90: 
+        return 0.10 * capital, 1.0, 4.0
+    elif score >= 80: 
+        return 0.07 * capital, 1.2, 5.0
+    else: 
+        return 0.05 * capital, 1.5, 6.0
+
+2. Momentum Scale-In (Stage 2)
+Trigger Conditions:
+
+Price reaches 50% of initial TP
+
+Step velocity ≥3 in trade direction
+
+Volatility (ATR) increasing
+
+Scaling Rules:
+
+def scale_in(position, entry, current_price):
+    progress = abs(current_price - entry) / abs(tp_base - entry)
+    
+    if progress >= 0.5 and step_velocity() >= 3:
+        # Add 50% of original position size
+        new_size = position * 1.5
+        
+        # Extend TP by 40%
+        new_tp = tp_base + 0.4 * abs(tp_base - entry) * trade_direction
+        
+        # Maintain original SL
+        return new_size, new_tp
+    
+return position, tp_base  # No scaling
+
+3. Hyper Extension (Stage 3)
+Trigger Conditions:
+
+Price reaches 80% of Stage 2 TP
+
+Extreme volatility (ATR > 2σ)
+No psychological barriers nearby
+
+Base TP Calculation
+
+Volatility-Adaptive TP Framework
+
+def calculate_dynamic_tp(entry, sl, rr_target, volatility):
+    base_distance = abs(entry - sl)
+    
+    # Volatility multiplier
+    if volatility < 0.5: mult = 0.8
+    elif volatility > 1.5: mult = 1.5
+    else: mult = 1.0
+    
+    tp_distance = base_distance * rr_target * mult
+    return entry + tp_distance * trade_direction
+
+
+Adaptive TP Matrix
+Volatility Regime	TP Extension	RR Multiplier
+Low (<0.5σ)	0.8×	-20%
+Normal (0.5-1.5σ)	1.0×	Base
+High (>1.5σ)	1.5×	+50%
+Extreme (>2.5σ)	2.0×	+100%
+
+
+Position Scaling Workflow
+1.Entry Signal:
+
+Calculate confluence score
+
+Determine base position size
+
+Set initial TP at 3.7× risk distance
+
+2.Momentum Check (50% TP)
+
+Confirm step velocity
+
+Scale in with 50% additional size
+
+Extend TP to 5× risk
+
+3.Volatility Explosion (80% TP)
+
+Confirm high volatility
+
+Double position size
+
+Set TP at 1.618 Fib extension
+
+Move SL to breakeven
+
+Implementation Requirements
+Real-time volatility monitoring (ATR)
+
+Step velocity tracker
+
+Psychological level database
+
+Position scaling execution system
+
+This strategy systematically increases reward-risk exposure during favorable conditions while maintaining strict risk controls. The pyramid scaling approach lets winners run while protecting capital during uncertain market phases.
