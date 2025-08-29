@@ -1,0 +1,28 @@
+{
+  "accounts": {
+    "account1": {
+      "api_token": "HVPPcwqc75HMSHg",
+      "risk_mode": "conservative",
+      "is_demo": true,
+      "max_balance": 10000,
+      "enabled": true,
+      "description": "Main conservative account"
+    },
+    "account2": {
+      "api_token": "PASTE_YOUR_SECOND_TOKEN_HERE",
+      "risk_mode": "moderate",
+      "is_demo": true,
+      "max_balance": 25000,
+      "enabled": false,
+      "description": "Moderate risk account"
+    },
+    "account3": {
+      "api_token": "PASTE_YOUR_THIRD_TOKEN_HERE",
+      "risk_mode": "aggressive",
+      "is_demo": true,
+      "max_balance": 50000,
+      "enabled": false,
+      "description": "High risk account"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "accounts": {
+    "main_account": {
+      "api_token": "YOUR_MAIN_API_TOKEN",
+      "risk_mode": "moderate",
+      "is_demo": true,
+      "max_balance": 25000,
+      "enabled": true,
+      "description": "Primary trading account"
+    },
+    "conservative_account": {
+      "api_token": "YOUR_CONSERVATIVE_API_TOKEN",
+      "risk_mode": "conservative",
+      "is_demo": true,
+      "max_balance": 10000,
+      "enabled": false,
+      "description": "Low risk steady growth"
+    },
+    "aggressive_account": {
+      "api_token": "YOUR_AGGRESSIVE_API_TOKEN",
+      "risk_mode": "aggressive",
+      "is_demo": true,
+      "max_balance": 50000,
+      "enabled": false,
+      "description": "High risk high reward"
+    },
+    "backup_account": {
+      "api_token": "YOUR_BACKUP_API_TOKEN",
+      "risk_mode": "moderate",
+      "is_demo": true,
+      "max_balance": 15000,
+      "enabled": false,
+      "description": "Backup account for redundancy"
+    }
+  },
+  "global_settings": {
+    "max_concurrent_accounts": 4,
+    "sync_signals": true,
+    "portfolio_rebalancing": false,
+    "emergency_stop_loss": 0.20
+  }
+}
